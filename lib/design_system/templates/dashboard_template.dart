@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../atoms/constants.dart';
 import '../atoms/button.dart';
-import '../atoms/base_components.dart';
 
 /// Data class for account summary information
 class AccountSummaryData {
@@ -226,18 +225,12 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseButton(
+    return BarakahButton(
+      label: label,
       onPressed: onTap,
       isOutlined: true,
       isSmall: true,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(height: BarakahSpacing.xs),
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
-        ],
-      ),
+      icon: icon,
     );
   }
 }

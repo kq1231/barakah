@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../atoms/constants.dart';
 import '../atoms/base_components.dart';
-import '../atoms/button.dart';
 
 class BalanceOverviewCard extends StatelessWidget {
   final double totalBalance;
@@ -63,9 +62,9 @@ class QuickActionGrid extends StatelessWidget {
   final List<QuickAction> actions;
 
   const QuickActionGrid({
-    Key? key,
+    super.key,
     required this.actions,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +88,7 @@ class QuickActionGrid extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: action.color.withOpacity(0.1),
+                    color: action.color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(action.icon, color: action.color),

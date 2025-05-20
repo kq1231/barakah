@@ -123,7 +123,13 @@ class SavingsScreen extends StatelessWidget {
             onPressed: () {
               if (formKey.currentState?.validate() ?? false) {
                 formKey.currentState?.save();
+                // TODO: Implement saving the new goal with name, targetAmount, targetDate, InshaaAllah
                 Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                          'Created new goal: $name (PKR ${targetAmount?.toStringAsFixed(0)})')),
+                );
               }
             },
             isSmall: true,

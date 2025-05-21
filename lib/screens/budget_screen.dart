@@ -1,239 +1,104 @@
 import 'package:flutter/material.dart';
-import '../design_system/atoms/constants.dart';
-import '../design_system/atoms/button.dart';
-import '../design_system/atoms/base_components.dart';
-import '../design_system/molecules/list_items.dart';
+import '../design_system/templates/budget_template.dart';
 
 class BudgetScreen extends StatelessWidget {
   const BudgetScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Budget'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Overview'),
-              Tab(text: 'Categories'),
-            ],
+    // Mock data - in a real app, this would come from a data layer
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month, 1);
+    final monthEnd = DateTime(now.year, now.month + 1, 0);
+
+    final categories = [
+      CategoryBudgetData(
+        name: 'Food',
+        icon: Icons.fastfood,
+        budget: 20000,
+        spent: 15000,
+        history: [
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 5),
+            amount: 5000,
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => _showAddBudgetDialog(context),
-            ),
-          ],
-        ),
-        body: TabBarView(
-          children: [
-            _BudgetOverviewTab(),
-            _BudgetCategoriesTab(),
-          ],
-        ),
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 12),
+            amount: 4500,
+          ),
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 20),
+            amount: 5500,
+          ),
+        ],
       ),
+      CategoryBudgetData(
+        name: 'Transport',
+        icon: Icons.directions_car,
+        budget: 10000,
+        spent: 8000,
+        history: [
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 3),
+            amount: 3000,
+          ),
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 10),
+            amount: 2500,
+          ),
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 18),
+            amount: 2500,
+          ),
+        ],
+      ),
+      CategoryBudgetData(
+        name: 'Entertainment',
+        icon: Icons.movie,
+        budget: 5000,
+        spent: 4500,
+        history: [
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 8),
+            amount: 2000,
+          ),
+          SpendingHistoryPoint(
+            date: DateTime(now.year, now.month, 22),
+            amount: 2500,
+          ),
+        ],
+      ),
+    ];
+
+    final overviewData = BudgetOverviewData(
+      totalBudget: 35000, // sum of all category budgets
+      totalSpent: 27500, // sum of all category spending
+      monthStart: monthStart,
+      monthEnd: monthEnd,
+      categories: categories,
+    );
+
+    return BudgetTemplate(
+      overview: overviewData,
+      onAddBudget: () => _showAddBudgetDialog(context),
+      onCategoryTap: (category) {
+        // Navigate to category detail screen
+        Navigator.pushNamed(
+          context,
+          '/budget/category',
+          arguments: {'category': category.name},
+        );
+      },
+      onBudgetCreated: (category, amount) {
+        // In a real app, you would save the new budget to a data source
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Budget added for $category: PKR $amount')),
+        );
+      },
     );
   }
 
   void _showAddBudgetDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Add Budget',
-          style: BarakahTypography.headline2,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Category',
-                prefixIcon: Icon(Icons.category),
-              ),
-              items: ['Food', 'Transport', 'Shopping']
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (value) {},
-            ),
-            const SizedBox(height: BarakahSpacing.md),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefixIcon: Icon(Icons.money),
-                prefixText: 'PKR ',
-              ),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          BarakahButton(
-            label: 'Cancel',
-            onPressed: () => Navigator.pop(context),
-            isOutlined: true,
-            isSmall: true,
-          ),
-          BarakahButton(
-            label: 'Add',
-            onPressed: () => Navigator.pop(context),
-            isSmall: true,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BudgetOverviewTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(BarakahSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildMonthlyOverview(),
-            const SizedBox(height: BarakahSpacing.lg),
-            Text(
-              'Categories',
-              style: BarakahTypography.headline2,
-            ),
-            const SizedBox(height: BarakahSpacing.md),
-            _buildCategoriesList(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMonthlyOverview() {
-    return BarakahCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Monthly Overview',
-            style: BarakahTypography.subtitle1,
-          ),
-          const SizedBox(height: BarakahSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Total Budget',
-                      style: BarakahTypography.caption,
-                    ),
-                    const SizedBox(height: BarakahSpacing.xs),
-                    const Text(
-                      'PKR 100,000',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Spent',
-                      style: BarakahTypography.caption,
-                    ),
-                    const SizedBox(height: BarakahSpacing.xs),
-                    const BarakahAmount(
-                      amount: -65000,
-                      showSign: false,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: BarakahSpacing.md),
-          const BarakahProgressBar(
-            value: 0.65,
-            color: BarakahColors.primary,
-          ),
-          const SizedBox(height: BarakahSpacing.sm),
-          Text(
-            '35% remaining',
-            style: BarakahTypography.caption,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoriesList() {
-    return Column(
-      children: [
-        BudgetProgressCard(
-          category: 'Food',
-          spent: 25000,
-          total: 30000,
-          color: BarakahColors.success,
-        ),
-        const SizedBox(height: BarakahSpacing.sm),
-        BudgetProgressCard(
-          category: 'Transport',
-          spent: 15000,
-          total: 20000,
-          color: BarakahColors.warning,
-        ),
-        const SizedBox(height: BarakahSpacing.sm),
-        BudgetProgressCard(
-          category: 'Shopping',
-          spent: 25000,
-          total: 50000,
-          color: BarakahColors.info,
-        ),
-      ],
-    );
-  }
-}
-
-class _BudgetCategoriesTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: const EdgeInsets.all(BarakahSpacing.md),
-      itemCount: 6,
-      separatorBuilder: (context, index) => const Divider(),
-      itemBuilder: (context, index) {
-        return ListTile(
-          leading: Container(
-            padding: const EdgeInsets.all(BarakahSpacing.sm),
-            decoration: BoxDecoration(
-              color: BarakahColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.category, color: BarakahColors.primary),
-          ),
-          title: Text(
-            [
-              'Food',
-              'Transport',
-              'Shopping',
-              'Bills',
-              'Entertainment',
-              'Others'
-            ][index],
-            style: BarakahTypography.subtitle1,
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {},
-        );
-      },
-    );
+    // This is handled internally by the BudgetTemplate
   }
 }

@@ -4,7 +4,7 @@ import '../design_system/atoms/button.dart';
 import '../design_system/atoms/base_components.dart';
 
 class AddAccountScreen extends StatefulWidget {
-  const AddAccountScreen({Key? key}) : super(key: key);
+  const AddAccountScreen({super.key});
 
   @override
   State<AddAccountScreen> createState() => _AddAccountScreenState();

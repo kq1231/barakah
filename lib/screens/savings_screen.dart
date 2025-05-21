@@ -2,44 +2,269 @@ import 'package:flutter/material.dart';
 import '../design_system/atoms/constants.dart';
 import '../design_system/atoms/button.dart';
 import '../design_system/atoms/base_components.dart';
+import '../design_system/templates/savings_template.dart';
 
-class SavingsScreen extends StatelessWidget {
+class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});
 
   @override
+  State<SavingsScreen> createState() => _SavingsScreenState();
+}
+
+class _SavingsScreenState extends State<SavingsScreen> {
+  // Mock data for savings goals
+  final List<SavingGoalData> _activeGoals = [
+    SavingGoalData(
+      name: 'New Car',
+      targetAmount: 500000.0,
+      currentAmount: 150000.0,
+      targetDate: DateTime(2025, 12, 31),
+    ),
+    SavingGoalData(
+      name: 'House Down Payment',
+      targetAmount: 2000000.0,
+      currentAmount: 500000.0,
+      targetDate: DateTime(2027, 1, 15),
+    ),
+    SavingGoalData(
+      name: 'Emergency Fund',
+      targetAmount: 300000.0,
+      currentAmount: 200000.0,
+      targetDate: DateTime(2025, 8, 30),
+    ),
+  ];
+
+  final List<SavingGoalData> _completedGoals = [
+    SavingGoalData(
+      name: 'Laptop',
+      targetAmount: 150000.0,
+      currentAmount: 150000.0,
+      targetDate: DateTime(2025, 3, 15),
+    ),
+    SavingGoalData(
+      name: 'Vacation',
+      targetAmount: 200000.0,
+      currentAmount: 200000.0,
+      targetDate: DateTime(2025, 4, 10),
+    ),
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Savings Goals'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Active'),
-              Tab(text: 'Completed'),
+    return SavingsTemplate(
+      activeGoals: _activeGoals,
+      completedGoals: _completedGoals,
+      onAddGoalPressed: () => _showAddGoalDialog(context),
+      onGoalSelected: _handleGoalSelected,
+      goalCardBuilder: _buildGoalCard,
+      onCreateGoal: _createNewGoal,
+    );
+  }
+
+  // Handle the selection of a savings goal
+  void _handleGoalSelected(SavingGoalData goal) {
+    // TODO: Navigate to goal detail screen or show detail dialog
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Selected goal: ${goal.name}')),
+    );
+  }
+
+  // Build a card widget for a savings goal
+  Widget _buildGoalCard(BuildContext context, SavingGoalData goal) {
+    final progress = goal.currentAmount / goal.targetAmount;
+    final isCompleted = goal.currentAmount >= goal.targetAmount;
+    final color = isCompleted
+        ? BarakahColors.success
+        : (progress > 0.7
+            ? BarakahColors.info
+            : progress > 0.4
+                ? BarakahColors.warning
+                : BarakahColors.error);
+
+    final targetDateString = goal.targetDate != null
+        ? '${goal.targetDate!.month}/${goal.targetDate!.year}'
+        : 'No date';
+
+    return BarakahCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(BarakahSpacing.sm),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  isCompleted ? Icons.check_circle : Icons.star,
+                  color: color,
+                ),
+              ),
+              const SizedBox(width: BarakahSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(goal.name, style: BarakahTypography.subtitle1),
+                    Text(
+                      'Target: $targetDateString',
+                      style: BarakahTypography.caption,
+                    ),
+                  ],
+                ),
+              ),
+              if (!isCompleted)
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: () => _showAddContributionDialog(context, goal),
+                  color: BarakahColors.primary,
+                ),
             ],
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () => _showAddGoalDialog(context),
+          const SizedBox(height: BarakahSpacing.md),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'PKR ${goal.currentAmount.toStringAsFixed(0)}',
+                style: BarakahTypography.body1,
+              ),
+              Text(
+                'PKR ${goal.targetAmount.toStringAsFixed(0)}',
+                style: BarakahTypography.body1,
+              ),
+            ],
+          ),
+          const SizedBox(height: BarakahSpacing.sm),
+          BarakahProgressBar(
+            value: progress,
+            color: color,
+          ),
+          const SizedBox(height: BarakahSpacing.sm),
+          Text(
+            '${(progress * 100).toStringAsFixed(1)}% saved',
+            style: BarakahTypography.caption.copyWith(
+              color: color,
             ),
-          ],
-        ),
-        body: TabBarView(
-          children: [
-            _ActiveGoalsTab(),
-            _CompletedGoalsTab(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
+  // Create a new goal and add it to the active goals list
+  Future<void> _createNewGoal(
+      String name, double targetAmount, DateTime? targetDate) async {
+    setState(() {
+      _activeGoals.add(
+        SavingGoalData(
+          name: name,
+          targetAmount: targetAmount,
+          currentAmount: 0,
+          targetDate: targetDate,
+        ),
+      );
+    });
+  }
+
+  // Show dialog to add money to an existing goal
+  void _showAddContributionDialog(BuildContext context, SavingGoalData goal) {
+    double? amount;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          'Add to ${goal.name}',
+          style: BarakahTypography.headline2,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Amount',
+                prefixText: 'PKR ',
+                prefixIcon: Icon(Icons.money),
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (value) => amount = double.tryParse(value),
+            ),
+            const SizedBox(height: BarakahSpacing.md),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(
+                labelText: 'From Account',
+                prefixIcon: Icon(Icons.account_balance_wallet),
+              ),
+              items: ['Cash', 'Bank Account', 'Savings Account']
+                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                  .toList(),
+              onChanged:
+                  (value) {}, // Account selection will be used in a full implementation
+            ),
+          ],
+        ),
+        actions: [
+          BarakahButton(
+            label: 'Cancel',
+            onPressed: () => Navigator.pop(context),
+            isOutlined: true,
+            isSmall: true,
+          ),
+          BarakahButton(
+            label: 'Add',
+            onPressed: () {
+              if (amount != null && amount! > 0) {
+                setState(() {
+                  // Find the index of this goal
+                  final index = _activeGoals.indexWhere((g) =>
+                      g.name == goal.name &&
+                      g.targetAmount == goal.targetAmount);
+
+                  if (index != -1) {
+                    // Create new updated goal
+                    final updatedGoal = SavingGoalData(
+                      name: goal.name,
+                      targetAmount: goal.targetAmount,
+                      currentAmount: goal.currentAmount + amount!,
+                      targetDate: goal.targetDate,
+                      notes: goal.notes,
+                      isRecurring: goal.isRecurring,
+                      recurringAmount: goal.recurringAmount,
+                    );
+
+                    // Replace the goal with updated version
+                    _activeGoals[index] = updatedGoal;
+
+                    // If goal is completed, move it to completed goals
+                    if (updatedGoal.currentAmount >= updatedGoal.targetAmount) {
+                      _activeGoals.removeAt(index);
+                      _completedGoals.add(updatedGoal);
+                    }
+                  }
+                });
+              }
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(
+                        'Added PKR ${amount?.toStringAsFixed(0) ?? 0} to ${goal.name}')),
+              );
+            },
+            isSmall: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Show dialog to add a new savings goal
   void _showAddGoalDialog(BuildContext context) {
     final formKey = GlobalKey<FormState>();
-    String? name;
-    double? targetAmount;
+    String name = '';
+    double targetAmount = 0;
     DateTime? targetDate;
 
     showDialog(
@@ -65,7 +290,9 @@ class SavingsScreen extends StatelessWidget {
                   }
                   return null;
                 },
-                onSaved: (value) => name = value,
+                onSaved: (value) {
+                  if (value != null) name = value;
+                },
               ),
               const SizedBox(height: BarakahSpacing.md),
               TextFormField(
@@ -79,9 +306,16 @@ class SavingsScreen extends StatelessWidget {
                   if (value?.isEmpty ?? true) {
                     return 'Please enter an amount';
                   }
+                  final amount = double.tryParse(value!);
+                  if (amount == null || amount <= 0) {
+                    return 'Please enter a valid amount';
+                  }
                   return null;
                 },
-                onSaved: (value) => targetAmount = double.tryParse(value ?? ''),
+                onSaved: (value) {
+                  final parsed = double.tryParse(value ?? '');
+                  if (parsed != null) targetAmount = parsed;
+                },
               ),
               const SizedBox(height: BarakahSpacing.md),
               InkWell(
@@ -93,7 +327,9 @@ class SavingsScreen extends StatelessWidget {
                     lastDate: DateTime.now().add(const Duration(days: 3650)),
                   );
                   if (date != null) {
-                    targetDate = date;
+                    setState(() {
+                      targetDate = date;
+                    });
                   }
                 },
                 child: InputDecorator(
@@ -123,204 +359,16 @@ class SavingsScreen extends StatelessWidget {
             onPressed: () {
               if (formKey.currentState?.validate() ?? false) {
                 formKey.currentState?.save();
-                // TODO: Implement saving the new goal with name, targetAmount, targetDate, InshaaAllah
+                _createNewGoal(name, targetAmount, targetDate);
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text(
-                          'Created new goal: $name (PKR ${targetAmount?.toStringAsFixed(0)})')),
+                    content: Text(
+                        'Created new goal: $name (PKR ${targetAmount.toStringAsFixed(0)})'),
+                  ),
                 );
               }
             },
-            isSmall: true,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActiveGoalsTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(BarakahSpacing.md),
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: BarakahSpacing.md),
-          child: _SavingsGoalCard(
-            name: ['New Car', 'House Down Payment', 'Emergency Fund'][index],
-            targetAmount: [500000.0, 2000000.0, 300000.0][index],
-            currentAmount: [150000.0, 500000.0, 200000.0][index],
-            targetDate: ['Dec 2025', 'Jan 2027', 'Aug 2025'][index],
-            color: [
-              BarakahColors.info,
-              BarakahColors.success,
-              BarakahColors.warning,
-            ][index],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CompletedGoalsTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(BarakahSpacing.md),
-      itemCount: 2,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: BarakahSpacing.md),
-          child: _SavingsGoalCard(
-            name: ['Laptop', 'Vacation'][index],
-            targetAmount: [150000.0, 200000.0][index],
-            currentAmount: [150000.0, 200000.0][index],
-            targetDate: ['Mar 2025', 'Apr 2025'][index],
-            isCompleted: true,
-            color: BarakahColors.success,
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _SavingsGoalCard extends StatelessWidget {
-  final String name;
-  final double targetAmount;
-  final double currentAmount;
-  final String targetDate;
-  final bool isCompleted;
-  final Color color;
-
-  const _SavingsGoalCard({
-    required this.name,
-    required this.targetAmount,
-    required this.currentAmount,
-    required this.targetDate,
-    this.isCompleted = false,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final progress = currentAmount / targetAmount;
-
-    return BarakahCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(BarakahSpacing.sm),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  isCompleted ? Icons.check_circle : Icons.star,
-                  color: color,
-                ),
-              ),
-              const SizedBox(width: BarakahSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(name, style: BarakahTypography.subtitle1),
-                    Text(
-                      'Target: $targetDate',
-                      style: BarakahTypography.caption,
-                    ),
-                  ],
-                ),
-              ),
-              if (!isCompleted)
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed: () => _showAddContributionDialog(context),
-                  color: BarakahColors.primary,
-                ),
-            ],
-          ),
-          const SizedBox(height: BarakahSpacing.md),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'PKR ${currentAmount.toStringAsFixed(0)}',
-                style: BarakahTypography.body1,
-              ),
-              Text(
-                'PKR ${targetAmount.toStringAsFixed(0)}',
-                style: BarakahTypography.body1,
-              ),
-            ],
-          ),
-          const SizedBox(height: BarakahSpacing.sm),
-          BarakahProgressBar(
-            value: progress,
-            color: color,
-          ),
-          const SizedBox(height: BarakahSpacing.sm),
-          Text(
-            '${(progress * 100).toStringAsFixed(1)}% saved',
-            style: BarakahTypography.caption.copyWith(
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddContributionDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(
-          'Add to $name',
-          style: BarakahTypography.headline2,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefixText: 'PKR ',
-                prefixIcon: Icon(Icons.money),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: BarakahSpacing.md),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'From Account',
-                prefixIcon: Icon(Icons.account_balance_wallet),
-              ),
-              items: ['Cash', 'Bank Account', 'Savings Account']
-                  .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                  .toList(),
-              onChanged: (value) {},
-            ),
-          ],
-        ),
-        actions: [
-          BarakahButton(
-            label: 'Cancel',
-            onPressed: () => Navigator.pop(context),
-            isOutlined: true,
-            isSmall: true,
-          ),
-          BarakahButton(
-            label: 'Add',
-            onPressed: () => Navigator.pop(context),
             isSmall: true,
           ),
         ],

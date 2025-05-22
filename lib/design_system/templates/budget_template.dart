@@ -98,6 +98,11 @@ class BudgetTemplate extends StatelessWidget {
             _buildCategoriesTab(context),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _showAddBudgetDialog(context),
+          heroTag: 'budget_add',
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }

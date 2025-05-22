@@ -14,13 +14,13 @@ import 'package:objectbox/internal.dart'
 import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
-import 'models/account.dart';
-import 'models/budget.dart';
-import 'models/category.dart';
-import 'models/contact.dart';
-import 'models/entry.dart';
-import 'models/saving_goal.dart';
-import 'models/transaction.dart';
+import 'features/accounts/models/account.dart';
+import 'features/budgets/models/budget.dart';
+import 'features/categories/models/category.dart';
+import 'features/contacts/models/contact.dart';
+import 'features/entries/models/entry.dart';
+import 'features/savings/models/saving_goal.dart';
+import 'features/transactions/models/transaction.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
 
@@ -53,47 +53,6 @@ final _entities = <obx_int.ModelEntity>[
             flags: 520,
             indexId: const obx_int.IdUid(1, 7653006143281060652),
             relationTarget: 'Account')
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
-  obx_int.ModelEntity(
-      id: const obx_int.IdUid(2, 1806098615627110598),
-      name: 'Budget',
-      lastPropertyId: const obx_int.IdUid(6, 8039913880059869431),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 7260254421597484709),
-            name: 'id',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 4610440391062913589),
-            name: 'name',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 3664054438232235903),
-            name: 'accountId',
-            type: 11,
-            flags: 520,
-            indexId: const obx_int.IdUid(2, 5173351544553027838),
-            relationTarget: 'Account'),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 9201487928872103954),
-            name: 'amount',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 4006589850970082602),
-            name: 'rrule',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 8039913880059869431),
-            name: 'notes',
-            type: 9,
-            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
@@ -189,67 +148,6 @@ final _entities = <obx_int.ModelEntity>[
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(6, 8216805419267016031),
-      name: 'SavingGoal',
-      lastPropertyId: const obx_int.IdUid(10, 2721919110677610261),
-      flags: 0,
-      properties: <obx_int.ModelProperty>[
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 2988972800829968112),
-            name: 'id',
-            type: 6,
-            flags: 1),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 7184642977562640959),
-            name: 'name',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 2938151915626991798),
-            name: 'targetAmount',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 6433146668338836495),
-            name: 'currentAmount',
-            type: 8,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 5969946338956407706),
-            name: 'targetDate',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 916463754704158661),
-            name: 'savingAccountId',
-            type: 11,
-            flags: 520,
-            indexId: const obx_int.IdUid(5, 9115734664564958575),
-            relationTarget: 'Account'),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(7, 2127868764177539973),
-            name: 'notes',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(8, 3661517658658146801),
-            name: 'isArchived',
-            type: 1,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(9, 2402876850429968481),
-            name: 'rrule',
-            type: 9,
-            flags: 0),
-        obx_int.ModelProperty(
-            id: const obx_int.IdUid(10, 2721919110677610261),
-            name: 'recurringAmount',
-            type: 8,
-            flags: 0)
-      ],
-      relations: <obx_int.ModelRelation>[],
-      backlinks: <obx_int.ModelBacklink>[]),
-  obx_int.ModelEntity(
       id: const obx_int.IdUid(7, 740633888816722784),
       name: 'Transaction',
       lastPropertyId: const obx_int.IdUid(5, 2505440122330321124),
@@ -282,6 +180,108 @@ final _entities = <obx_int.ModelEntity>[
             flags: 520,
             indexId: const obx_int.IdUid(6, 5779602685810808741),
             relationTarget: 'Contact')
+      ],
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(8, 6465623724366909622),
+      name: 'SavingGoal',
+      lastPropertyId: const obx_int.IdUid(10, 4334387027085466203),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 8766068182851955815),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 5411387150541177047),
+            name: 'name',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 1663126855961500694),
+            name: 'targetAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 5272452352130648204),
+            name: 'currentAmount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3416729695560417834),
+            name: 'targetDate',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 65992339483023836),
+            name: 'savingAccountId',
+            type: 11,
+            flags: 520,
+            indexId: const obx_int.IdUid(7, 4862079231364135928),
+            relationTarget: 'Account'),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 3986588696435960670),
+            name: 'notes',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 9030541394015405378),
+            name: 'isArchived',
+            type: 1,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 2722409256951412317),
+            name: 'rrule',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 4334387027085466203),
+            name: 'recurringAmount',
+            type: 8,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(9, 6075724319454888878),
+      name: 'Budget',
+      lastPropertyId: const obx_int.IdUid(6, 3871966550979633307),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 4878608196630498712),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 2962998048707497105),
+            name: 'name',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 6312611706749472611),
+            name: 'accountId',
+            type: 11,
+            flags: 520,
+            indexId: const obx_int.IdUid(8, 8757253880787924036),
+            relationTarget: 'Account'),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 3031911266575721047),
+            name: 'amount',
+            type: 8,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3697385581907996022),
+            name: 'rrule',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 3871966550979633307),
+            name: 'notes',
+            type: 9,
+            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
@@ -322,13 +322,30 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(7, 740633888816722784),
-      lastIndexId: const obx_int.IdUid(6, 5779602685810808741),
+      lastEntityId: const obx_int.IdUid(9, 6075724319454888878),
+      lastIndexId: const obx_int.IdUid(8, 8757253880787924036),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
-      retiredEntityUids: const [],
+      retiredEntityUids: const [1806098615627110598, 8216805419267016031],
       retiredIndexUids: const [],
-      retiredPropertyUids: const [],
+      retiredPropertyUids: const [
+        7260254421597484709,
+        4610440391062913589,
+        3664054438232235903,
+        9201487928872103954,
+        4006589850970082602,
+        8039913880059869431,
+        2988972800829968112,
+        7184642977562640959,
+        2938151915626991798,
+        6433146668338836495,
+        5969946338956407706,
+        916463754704158661,
+        2127868764177539973,
+        3661517658658146801,
+        2402876850429968481,
+        2721919110677610261
+      ],
       retiredRelationUids: const [],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
@@ -368,54 +385,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.parent.attach(store);
           return object;
         }),
-    Budget: obx_int.EntityDefinition<Budget>(
-        model: _entities[1],
-        toOneRelations: (Budget object) => [object.account],
-        toManyRelations: (Budget object) => {},
-        getId: (Budget object) => object.id,
-        setId: (Budget object, int id) {
-          object.id = id;
-        },
-        objectToFB: (Budget object, fb.Builder fbb) {
-          final nameOffset = fbb.writeString(object.name);
-          final rruleOffset =
-              object.rrule == null ? null : fbb.writeString(object.rrule!);
-          final notesOffset =
-              object.notes == null ? null : fbb.writeString(object.notes!);
-          fbb.startTable(7);
-          fbb.addInt64(0, object.id);
-          fbb.addOffset(1, nameOffset);
-          fbb.addInt64(2, object.account.targetId);
-          fbb.addFloat64(3, object.amount);
-          fbb.addOffset(4, rruleOffset);
-          fbb.addOffset(5, notesOffset);
-          fbb.finish(fbb.endTable());
-          return object.id;
-        },
-        objectFromFB: (obx.Store store, ByteData fbData) {
-          final buffer = fb.BufferContext(fbData);
-          final rootOffset = buffer.derefObject(0);
-          final nameParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 6, '');
-          final amountParam =
-              const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
-          final rruleParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGetNullable(buffer, rootOffset, 12);
-          final notesParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGetNullable(buffer, rootOffset, 14);
-          final object = Budget(
-              name: nameParam,
-              amount: amountParam,
-              rrule: rruleParam,
-              notes: notesParam)
-            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-          object.account.targetId =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
-          object.account.attach(store);
-          return object;
-        }),
     Category: obx_int.EntityDefinition<Category>(
-        model: _entities[2],
+        model: _entities[1],
         toOneRelations: (Category object) => [],
         toManyRelations: (Category object) => {},
         getId: (Category object) => object.id,
@@ -445,7 +416,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     Contact: obx_int.EntityDefinition<Contact>(
-        model: _entities[3],
+        model: _entities[2],
         toOneRelations: (Contact object) => [],
         toManyRelations: (Contact object) => {},
         getId: (Contact object) => object.id,
@@ -475,7 +446,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           return object;
         }),
     Entry: obx_int.EntityDefinition<Entry>(
-        model: _entities[4],
+        model: _entities[3],
         toOneRelations: (Entry object) => [object.transaction, object.account],
         toManyRelations: (Entry object) => {},
         getId: (Entry object) => object.id,
@@ -513,6 +484,51 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.account.targetId =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
           object.account.attach(store);
+          return object;
+        }),
+    Transaction: obx_int.EntityDefinition<Transaction>(
+        model: _entities[4],
+        toOneRelations: (Transaction object) => [object.contact],
+        toManyRelations: (Transaction object) => {},
+        getId: (Transaction object) => object.id,
+        setId: (Transaction object, int id) {
+          object.id = id;
+        },
+        objectToFB: (Transaction object, fb.Builder fbb) {
+          final dateOffset = fbb.writeString(object.date);
+          final descriptionOffset = object.description == null
+              ? null
+              : fbb.writeString(object.description!);
+          final referenceOffset = object.reference == null
+              ? null
+              : fbb.writeString(object.reference!);
+          fbb.startTable(6);
+          fbb.addInt64(0, object.id);
+          fbb.addOffset(1, dateOffset);
+          fbb.addOffset(2, descriptionOffset);
+          fbb.addOffset(3, referenceOffset);
+          fbb.addInt64(4, object.contact.targetId);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final dateParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 6, '');
+          final descriptionParam =
+              const fb.StringReader(asciiOptimization: true)
+                  .vTableGetNullable(buffer, rootOffset, 8);
+          final referenceParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGetNullable(buffer, rootOffset, 10);
+          final object = Transaction(
+              date: dateParam,
+              description: descriptionParam,
+              reference: referenceParam)
+            ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          object.contact.targetId =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
+          object.contact.attach(store);
           return object;
         }),
     SavingGoal: obx_int.EntityDefinition<SavingGoal>(
@@ -580,49 +596,50 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.savingAccount.attach(store);
           return object;
         }),
-    Transaction: obx_int.EntityDefinition<Transaction>(
+    Budget: obx_int.EntityDefinition<Budget>(
         model: _entities[6],
-        toOneRelations: (Transaction object) => [object.contact],
-        toManyRelations: (Transaction object) => {},
-        getId: (Transaction object) => object.id,
-        setId: (Transaction object, int id) {
+        toOneRelations: (Budget object) => [object.account],
+        toManyRelations: (Budget object) => {},
+        getId: (Budget object) => object.id,
+        setId: (Budget object, int id) {
           object.id = id;
         },
-        objectToFB: (Transaction object, fb.Builder fbb) {
-          final dateOffset = fbb.writeString(object.date);
-          final descriptionOffset = object.description == null
-              ? null
-              : fbb.writeString(object.description!);
-          final referenceOffset = object.reference == null
-              ? null
-              : fbb.writeString(object.reference!);
-          fbb.startTable(6);
+        objectToFB: (Budget object, fb.Builder fbb) {
+          final nameOffset = fbb.writeString(object.name);
+          final rruleOffset =
+              object.rrule == null ? null : fbb.writeString(object.rrule!);
+          final notesOffset =
+              object.notes == null ? null : fbb.writeString(object.notes!);
+          fbb.startTable(7);
           fbb.addInt64(0, object.id);
-          fbb.addOffset(1, dateOffset);
-          fbb.addOffset(2, descriptionOffset);
-          fbb.addOffset(3, referenceOffset);
-          fbb.addInt64(4, object.contact.targetId);
+          fbb.addOffset(1, nameOffset);
+          fbb.addInt64(2, object.account.targetId);
+          fbb.addFloat64(3, object.amount);
+          fbb.addOffset(4, rruleOffset);
+          fbb.addOffset(5, notesOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
-          final dateParam = const fb.StringReader(asciiOptimization: true)
+          final nameParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 6, '');
-          final descriptionParam =
-              const fb.StringReader(asciiOptimization: true)
-                  .vTableGetNullable(buffer, rootOffset, 8);
-          final referenceParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGetNullable(buffer, rootOffset, 10);
-          final object = Transaction(
-              date: dateParam,
-              description: descriptionParam,
-              reference: referenceParam)
+          final amountParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 10, 0);
+          final rruleParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGetNullable(buffer, rootOffset, 12);
+          final notesParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGetNullable(buffer, rootOffset, 14);
+          final object = Budget(
+              name: nameParam,
+              amount: amountParam,
+              rrule: rruleParam,
+              notes: notesParam)
             ..id = const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
-          object.contact.targetId =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 12, 0);
-          object.contact.attach(store);
+          object.account.targetId =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0);
+          object.account.attach(store);
           return object;
         })
   };
@@ -649,87 +666,83 @@ class Account_ {
       obx.QueryRelationToOne<Account, Account>(_entities[0].properties[3]);
 }
 
-/// [Budget] entity fields to define ObjectBox queries.
-class Budget_ {
-  /// See [Budget.id].
-  static final id =
-      obx.QueryIntegerProperty<Budget>(_entities[1].properties[0]);
-
-  /// See [Budget.name].
-  static final name =
-      obx.QueryStringProperty<Budget>(_entities[1].properties[1]);
-
-  /// See [Budget.account].
-  static final account =
-      obx.QueryRelationToOne<Budget, Account>(_entities[1].properties[2]);
-
-  /// See [Budget.amount].
-  static final amount =
-      obx.QueryDoubleProperty<Budget>(_entities[1].properties[3]);
-
-  /// See [Budget.rrule].
-  static final rrule =
-      obx.QueryStringProperty<Budget>(_entities[1].properties[4]);
-
-  /// See [Budget.notes].
-  static final notes =
-      obx.QueryStringProperty<Budget>(_entities[1].properties[5]);
-}
-
 /// [Category] entity fields to define ObjectBox queries.
 class Category_ {
   /// See [Category.id].
   static final id =
-      obx.QueryIntegerProperty<Category>(_entities[2].properties[0]);
+      obx.QueryIntegerProperty<Category>(_entities[1].properties[0]);
 
   /// See [Category.name].
   static final name =
-      obx.QueryStringProperty<Category>(_entities[2].properties[1]);
+      obx.QueryStringProperty<Category>(_entities[1].properties[1]);
 
   /// See [Category.type].
   static final type =
-      obx.QueryStringProperty<Category>(_entities[2].properties[2]);
+      obx.QueryStringProperty<Category>(_entities[1].properties[2]);
 }
 
 /// [Contact] entity fields to define ObjectBox queries.
 class Contact_ {
   /// See [Contact.id].
   static final id =
-      obx.QueryIntegerProperty<Contact>(_entities[3].properties[0]);
+      obx.QueryIntegerProperty<Contact>(_entities[2].properties[0]);
 
   /// See [Contact.name].
   static final name =
-      obx.QueryStringProperty<Contact>(_entities[3].properties[1]);
+      obx.QueryStringProperty<Contact>(_entities[2].properties[1]);
 
   /// See [Contact.type].
   static final type =
-      obx.QueryStringProperty<Contact>(_entities[3].properties[2]);
+      obx.QueryStringProperty<Contact>(_entities[2].properties[2]);
 }
 
 /// [Entry] entity fields to define ObjectBox queries.
 class Entry_ {
   /// See [Entry.id].
-  static final id = obx.QueryIntegerProperty<Entry>(_entities[4].properties[0]);
+  static final id = obx.QueryIntegerProperty<Entry>(_entities[3].properties[0]);
 
   /// See [Entry.transaction].
   static final transaction =
-      obx.QueryRelationToOne<Entry, Transaction>(_entities[4].properties[1]);
+      obx.QueryRelationToOne<Entry, Transaction>(_entities[3].properties[1]);
 
   /// See [Entry.account].
   static final account =
-      obx.QueryRelationToOne<Entry, Account>(_entities[4].properties[2]);
+      obx.QueryRelationToOne<Entry, Account>(_entities[3].properties[2]);
 
   /// See [Entry.amount].
   static final amount =
-      obx.QueryDoubleProperty<Entry>(_entities[4].properties[3]);
+      obx.QueryDoubleProperty<Entry>(_entities[3].properties[3]);
 
   /// See [Entry.isDebit].
   static final isDebit =
-      obx.QueryBooleanProperty<Entry>(_entities[4].properties[4]);
+      obx.QueryBooleanProperty<Entry>(_entities[3].properties[4]);
 
   /// See [Entry.categoryId].
   static final categoryId =
-      obx.QueryIntegerProperty<Entry>(_entities[4].properties[5]);
+      obx.QueryIntegerProperty<Entry>(_entities[3].properties[5]);
+}
+
+/// [Transaction] entity fields to define ObjectBox queries.
+class Transaction_ {
+  /// See [Transaction.id].
+  static final id =
+      obx.QueryIntegerProperty<Transaction>(_entities[4].properties[0]);
+
+  /// See [Transaction.date].
+  static final date =
+      obx.QueryStringProperty<Transaction>(_entities[4].properties[1]);
+
+  /// See [Transaction.description].
+  static final description =
+      obx.QueryStringProperty<Transaction>(_entities[4].properties[2]);
+
+  /// See [Transaction.reference].
+  static final reference =
+      obx.QueryStringProperty<Transaction>(_entities[4].properties[3]);
+
+  /// See [Transaction.contact].
+  static final contact =
+      obx.QueryRelationToOne<Transaction, Contact>(_entities[4].properties[4]);
 }
 
 /// [SavingGoal] entity fields to define ObjectBox queries.
@@ -775,25 +788,29 @@ class SavingGoal_ {
       obx.QueryDoubleProperty<SavingGoal>(_entities[5].properties[9]);
 }
 
-/// [Transaction] entity fields to define ObjectBox queries.
-class Transaction_ {
-  /// See [Transaction.id].
+/// [Budget] entity fields to define ObjectBox queries.
+class Budget_ {
+  /// See [Budget.id].
   static final id =
-      obx.QueryIntegerProperty<Transaction>(_entities[6].properties[0]);
+      obx.QueryIntegerProperty<Budget>(_entities[6].properties[0]);
 
-  /// See [Transaction.date].
-  static final date =
-      obx.QueryStringProperty<Transaction>(_entities[6].properties[1]);
+  /// See [Budget.name].
+  static final name =
+      obx.QueryStringProperty<Budget>(_entities[6].properties[1]);
 
-  /// See [Transaction.description].
-  static final description =
-      obx.QueryStringProperty<Transaction>(_entities[6].properties[2]);
+  /// See [Budget.account].
+  static final account =
+      obx.QueryRelationToOne<Budget, Account>(_entities[6].properties[2]);
 
-  /// See [Transaction.reference].
-  static final reference =
-      obx.QueryStringProperty<Transaction>(_entities[6].properties[3]);
+  /// See [Budget.amount].
+  static final amount =
+      obx.QueryDoubleProperty<Budget>(_entities[6].properties[3]);
 
-  /// See [Transaction.contact].
-  static final contact =
-      obx.QueryRelationToOne<Transaction, Contact>(_entities[6].properties[4]);
+  /// See [Budget.rrule].
+  static final rrule =
+      obx.QueryStringProperty<Budget>(_entities[6].properties[4]);
+
+  /// See [Budget.notes].
+  static final notes =
+      obx.QueryStringProperty<Budget>(_entities[6].properties[5]);
 }

@@ -49,7 +49,7 @@ class GoalCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(BarakahSpacing.xs),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: theme.colorScheme.surfaceVariant,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   progressColor ?? theme.colorScheme.primary,
                 ),
@@ -75,7 +75,8 @@ class GoalCard extends StatelessWidget {
               Text(
                 'Target: ${_formatDate(goal.targetDate!)}',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.7),
+                  color:
+                      theme.textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                 ),
               ),
             ],

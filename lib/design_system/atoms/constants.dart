@@ -29,6 +29,12 @@ class BarakahTypography {
     color: BarakahColors.textPrimary,
   );
 
+  static const headline3 = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: BarakahColors.textPrimary,
+  );
+
   static const subtitle1 = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,

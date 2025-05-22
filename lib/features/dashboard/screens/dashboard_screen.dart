@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../design_system/templates/dashboard_template.dart';
+import 'package:barakah/design_system/templates/dashboard_template.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});

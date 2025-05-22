@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard_screen.dart';
-import 'screens/transaction_screen.dart';
-import 'screens/accounts_screen.dart';
-import 'screens/budget_screen.dart';
-import 'screens/reports_screen.dart';
-import 'screens/savings_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'features/dashboard/screens/dashboard_screen.dart';
+import 'features/transactions/screens/transaction_list_screen.dart';
+import 'features/accounts/screens/accounts_screen.dart';
+import 'features/budgets/screens/budget_screen.dart';
+import 'features/reports/screens/reports_screen.dart';
+import 'features/savings/screens/savings_screen.dart';
+import 'common/screens/startup_screen.dart';
+import 'providers/app_startup_provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  // Ensure Flutter binding is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Run the app wrapped with ProviderScope for Riverpod
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final startupState = ref.watch(appStartupProvider);
+
     return MaterialApp(
       title: 'Barakah Finance',
       theme: ThemeData(
@@ -27,16 +36,27 @@ class MyApp extends StatelessWidget {
         navigationBarTheme: NavigationBarThemeData(
           labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
           height: 56,
-          indicatorColor: Colors.green.withOpacity(0.1),
-          iconTheme: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          indicatorColor: Colors.green.withValues(alpha: 0.1),
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return const IconThemeData(size: 28.0);
             }
             return const IconThemeData(size: 24.0);
           }),
         ),
       ),
-      home: const HomeScreen(),
+      home: startupState.when(
+        data: (status) {
+          // Once initialization is complete, show the main home screen
+          if (status.state == AppStartupState.initialized) {
+            return const HomeScreen();
+          }
+          // Otherwise show the startup screen which handles loading and error states
+          return const StartupScreen();
+        },
+        loading: () => const StartupScreen(),
+        error: (_, __) => const StartupScreen(),
+      ),
     );
   }
 }
@@ -53,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const TransactionScreen(),
+    const TransactionListScreen(),
     const AccountsScreen(),
     const BudgetScreen(),
     const ReportsScreen(),
@@ -99,16 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Savings',
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const TransactionScreen(),
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }

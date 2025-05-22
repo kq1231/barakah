@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../design_system/atoms/constants.dart';
-import '../design_system/atoms/base_components.dart';
-import '../design_system/molecules/charts.dart';
-import '../design_system/templates/reports_template.dart';
+import 'package:barakah/design_system/atoms/constants.dart';
+import 'package:barakah/design_system/atoms/base_components.dart';
+import 'package:barakah/design_system/molecules/charts.dart';
+import 'package:barakah/design_system/templates/reports_template.dart';
 
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});

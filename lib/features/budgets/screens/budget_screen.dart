@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../design_system/templates/budget_template.dart';
+import 'package:barakah/design_system/templates/budget_template.dart';
 
 class BudgetScreen extends StatelessWidget {
   const BudgetScreen({super.key});

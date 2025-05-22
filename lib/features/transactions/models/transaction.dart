@@ -1,5 +1,5 @@
 import 'package:objectbox/objectbox.dart';
-import 'contact.dart';
+import 'package:barakah/features/contacts/models/contact.dart';
 
 @Entity()
 class Transaction {

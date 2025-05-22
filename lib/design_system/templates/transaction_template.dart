@@ -34,7 +34,7 @@ class TransactionTemplate extends StatelessWidget {
   final VoidCallback onCancel;
 
   const TransactionTemplate({
-    Key? key,
+    super.key,
     required this.title,
     required this.transactionTypes,
     required this.selectedType,
@@ -59,7 +59,7 @@ class TransactionTemplate extends StatelessWidget {
     required this.onFrequencyChanged,
     required this.onSave,
     required this.onCancel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

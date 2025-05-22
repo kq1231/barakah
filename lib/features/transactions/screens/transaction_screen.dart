@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../design_system/templates/transaction_template.dart';
+import 'package:barakah/design_system/templates/transaction_template.dart';
 
 class TransactionScreen extends StatefulWidget {
   final Map<String, dynamic>? arguments;

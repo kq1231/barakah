@@ -1,5 +1,5 @@
 import 'package:objectbox/objectbox.dart';
-import 'account.dart';
+import 'package:barakah/features/accounts/models/account.dart';
 
 @Entity()
 class SavingGoal {

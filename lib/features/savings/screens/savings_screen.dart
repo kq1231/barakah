@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../design_system/atoms/constants.dart';
-import '../design_system/atoms/button.dart';
-import '../design_system/atoms/base_components.dart';
-import '../design_system/templates/savings_template.dart';
+import 'package:barakah/design_system/atoms/constants.dart';
+import 'package:barakah/design_system/atoms/button.dart';
+import 'package:barakah/design_system/atoms/base_components.dart';
+import 'package:barakah/design_system/templates/savings_template.dart';
 
 class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});

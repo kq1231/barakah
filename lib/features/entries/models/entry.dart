@@ -1,6 +1,6 @@
 import 'package:objectbox/objectbox.dart';
-import 'transaction.dart';
-import 'account.dart';
+import '../../transactions/models/transaction.dart';
+import '../../accounts/models/account.dart';
 
 @Entity()
 class Entry {

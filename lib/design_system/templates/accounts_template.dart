@@ -94,6 +94,7 @@ class AccountsTemplate extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: onAddAccount,
+        heroTag: 'account_add',
         child: const Icon(Icons.add),
       ),
     );

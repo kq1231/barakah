@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../models/account.dart';
 import '../repositories/account_repository.dart';
-import '../../../providers/app_startup_provider.dart';
+import '../../../common/providers/app_startup_provider.dart';
 
 part 'account_provider.g.dart';
 

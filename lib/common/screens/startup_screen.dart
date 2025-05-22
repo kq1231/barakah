@@ -1,7 +1,7 @@
 // filepath: lib/screens/startup_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:barakah/providers/app_startup_provider.dart';
+import 'package:barakah/common/providers/app_startup_provider.dart';
 
 class StartupScreen extends ConsumerWidget {
   const StartupScreen({super.key});

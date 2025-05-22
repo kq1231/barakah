@@ -7,7 +7,7 @@ import 'features/budgets/screens/budget_screen.dart';
 import 'features/reports/screens/reports_screen.dart';
 import 'features/savings/screens/savings_screen.dart';
 import 'common/screens/startup_screen.dart';
-import 'providers/app_startup_provider.dart';
+import 'common/providers/app_startup_provider.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized

@@ -4,7 +4,7 @@
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import '../objectbox.g.dart'; // This will be generated after running build_runner, InshaaAllah
+import '../../objectbox.g.dart'; // This will be generated after running build_runner, InshaaAllah
 
 /// A service that handles ObjectBox initialization and provides access to the store.
 class ObjectBoxService {

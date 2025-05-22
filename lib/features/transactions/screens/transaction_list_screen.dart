@@ -127,9 +127,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
         }
         break;
       case TransactionFilterOption.all:
-      default:
-        // No filter
-        break;
     }
 
     // Apply sorting
@@ -147,7 +144,6 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
         transactions.sort((a, b) => a.category.compareTo(b.category));
         break;
       case TransactionSortOption.dateDesc:
-      default:
         transactions.sort((a, b) => b.date.compareTo(a.date));
         break;
     }

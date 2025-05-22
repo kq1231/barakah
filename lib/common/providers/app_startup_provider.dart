@@ -47,7 +47,8 @@ class AppStartup extends _$AppStartup {
       state = const AsyncValue.data(AppStartupStatus.initializing());
 
       // Initialize the ObjectBox store - we await this to ensure it's ready
-      final objectBoxStore = await ref.watch(objectBoxStoreProvider.future);
+      // final objectBoxStore =
+      await ref.watch(objectBoxStoreProvider.future);
 
       // Add any other initialization tasks here
       // For example, loading user preferences, authentication state, etc.

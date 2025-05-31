@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../atoms/constants.dart';
 import '../atoms/button.dart';
 import '../atoms/base_components.dart';
+import '../molecules/flexible_entry_row.dart';
+import '../molecules/entry_data.dart';
 
 /// A template for transaction-related screens that's business logic agnostic.
 /// This template defines the UI structure and accepts callbacks for all interactions.
@@ -22,6 +24,12 @@ class TransactionTemplate extends StatelessWidget {
   final List<String> frequencies;
   final GlobalKey<FormState> formKey;
 
+  // Double-entry specific properties
+  final List<EntryData> entries;
+  final double totalDebits;
+  final double totalCredits;
+  final bool isBalanced;
+
   // Callbacks
   final ValueChanged<TransactionTypeData> onTypeChanged;
   final VoidCallback onDateTapped;
@@ -32,6 +40,13 @@ class TransactionTemplate extends StatelessWidget {
   final ValueChanged<String?> onFrequencyChanged;
   final VoidCallback onSave;
   final VoidCallback onCancel;
+
+  // Double-entry callbacks
+  final VoidCallback onAddEntry;
+  final Function(int) onRemoveEntry;
+  final Function(int, String?) onEntryAccountChanged;
+  final Function(int, bool) onEntryTypeChanged;
+  final Function(int, String) onEntryAmountChanged;
 
   const TransactionTemplate({
     super.key,
@@ -59,7 +74,22 @@ class TransactionTemplate extends StatelessWidget {
     required this.onFrequencyChanged,
     required this.onSave,
     required this.onCancel,
+    // Double-entry properties
+    this.entries = const [],
+    this.totalDebits = 0,
+    this.totalCredits = 0,
+    this.isBalanced = false,
+    this.onAddEntry = _defaultCallback,
+    this.onRemoveEntry = _defaultIndexCallback,
+    this.onEntryAccountChanged = _defaultIndexStringCallback,
+    this.onEntryTypeChanged = _defaultIndexBoolCallback,
+    this.onEntryAmountChanged = _defaultIndexStringCallback,
   });
+
+  static void _defaultCallback() {}
+  static void _defaultIndexCallback(int _) {}
+  static void _defaultIndexStringCallback(int _, String? __) {}
+  static void _defaultIndexBoolCallback(int _, bool __) {}
 
   @override
   Widget build(BuildContext context) {
@@ -77,15 +107,19 @@ class TransactionTemplate extends StatelessWidget {
               children: [
                 _buildTypeSelector(),
                 const SizedBox(height: BarakahSpacing.lg),
-                _buildAmountInput(),
-                const SizedBox(height: BarakahSpacing.lg),
-                _buildDatePicker(context),
-                const SizedBox(height: BarakahSpacing.lg),
-                if (selectedType.showCategory) ...[
-                  _buildCategoryDropdown(),
+                if (!selectedType.isDoubleEntry) ...[
+                  // Standard transaction fields
+                  _buildAmountInput(),
                   const SizedBox(height: BarakahSpacing.lg),
+                  _buildDatePicker(context),
+                  const SizedBox(height: BarakahSpacing.lg),
+                  _buildAccountSelection(),
+                ] else ...[
+                  // Double-entry transaction fields
+                  _buildDatePicker(context),
+                  const SizedBox(height: BarakahSpacing.lg),
+                  _buildDoubleEntrySection(),
                 ],
-                _buildAccountSelection(),
                 const SizedBox(height: BarakahSpacing.lg),
                 _buildRecurringSection(),
                 const SizedBox(height: BarakahSpacing.lg),
@@ -183,93 +217,144 @@ class TransactionTemplate extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryDropdown() {
-    return BarakahCard(
-      child: DropdownButtonFormField<String>(
-        value: selectedCategory,
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          prefixIcon: Icon(Icons.category, color: BarakahColors.primary),
-          hintText: 'Select Category',
-        ),
-        items: categories.map((category) {
-          return DropdownMenuItem(
-            value: category,
-            child: Text(category),
-          );
-        }).toList(),
-        onChanged: onCategoryChanged,
-        validator: (value) {
-          if (selectedType.showCategory && (value == null || value.isEmpty)) {
-            return 'Please select a category';
-          }
-          return null;
-        },
-      ),
-    );
-  }
+  // Removed category dropdown as requested
 
   Widget _buildAccountSelection() {
+    final String fromLabel = selectedType.fromAccountLabel ??
+        (selectedType.isTransfer
+            ? 'FROM Account (Money Coming Out)'
+            : selectedType.label == 'Expense'
+                ? 'FROM Account (Money Being Spent)'
+                : selectedType.label == 'Income'
+                    ? 'INTO Account (Money Being Received)'
+                    : 'Select Account');
+
+    final String toLabel = selectedType.toAccountLabel ??
+        (selectedType.isTransfer
+            ? 'INTO Account (Money Going In)'
+            : selectedType.label == 'Expense'
+                ? 'INTO Account (Expense Category)'
+                : 'TO Account');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        BarakahCard(
-          child: DropdownButtonFormField<String>(
-            value: selectedAccount,
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              prefixIcon: const Icon(
-                Icons.account_balance_wallet,
-                color: BarakahColors.primary,
+        // Source/From account
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              selectedType.label == 'Income'
+                  ? 'Which account is receiving the money? (Bank, Cash, etc.)'
+                  : 'Which account is the money coming from?',
+              style: BarakahTypography.caption.copyWith(
+                fontWeight: FontWeight.bold,
               ),
-              hintText:
-                  selectedType.isTransfer ? 'From Account' : 'Select Account',
             ),
-            items: accounts.map((account) {
-              return DropdownMenuItem(
-                value: account,
-                child: Text(account),
-              );
-            }).toList(),
-            onChanged: onAccountChanged,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please select an account';
-              }
-              return null;
-            },
-          ),
-        ),
-        if (selectedType.isTransfer) ...[
-          const SizedBox(height: BarakahSpacing.md),
-          BarakahCard(
-            child: DropdownButtonFormField<String>(
-              value: selectedToAccount,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                prefixIcon: Icon(
-                  Icons.account_balance_wallet,
-                  color: BarakahColors.primary,
+            const SizedBox(height: BarakahSpacing.xs),
+            BarakahCard(
+              child: DropdownButtonFormField<String>(
+                value: selectedAccount,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    selectedType.label == 'Income'
+                        ? Icons.arrow_downward
+                        : Icons.arrow_upward,
+                    color: BarakahColors.primary,
+                  ),
+                  hintText: fromLabel,
+                  helperText: selectedType.label == 'Expense'
+                      ? 'Example: Cash or Bank Account'
+                      : selectedType.label == 'Income'
+                          ? 'Example: Bank Account or Cash'
+                          : null,
                 ),
-                hintText: 'To Account',
+                items: accounts.map((account) {
+                  return DropdownMenuItem(
+                    value: account,
+                    child: Text(account),
+                  );
+                }).toList(),
+                onChanged: onAccountChanged,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select an account';
+                  }
+                  return null;
+                },
               ),
-              items: accounts
-                  .where((account) => account != selectedAccount)
-                  .map((account) {
-                return DropdownMenuItem(
-                  value: account,
-                  child: Text(account),
-                );
-              }).toList(),
-              onChanged: onToAccountChanged,
-              validator: (value) {
-                if (selectedType.isTransfer &&
-                    (value == null || value.isEmpty)) {
-                  return 'Please select destination account';
-                }
-                return null;
-              },
             ),
+          ],
+        ),
+
+        if (selectedType.isTransfer ||
+            selectedType.label == 'Expense' ||
+            selectedType.label == 'Income') ...[
+          const SizedBox(height: BarakahSpacing.md),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                selectedType.isTransfer
+                    ? 'Which account is receiving the money?'
+                    : selectedType.label == 'Expense'
+                        ? 'What expense account is this for?'
+                        : 'Which income source is providing the money?',
+                style: BarakahTypography.caption.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: BarakahSpacing.xs),
+              BarakahCard(
+                child: DropdownButtonFormField<String>(
+                  value: selectedToAccount,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    prefixIcon: Icon(
+                      selectedType.isTransfer
+                          ? Icons.arrow_downward
+                          : selectedType.label == 'Income'
+                              ? Icons.monetization_on
+                              : Icons.category,
+                      color: BarakahColors.primary,
+                    ),
+                    hintText: toLabel,
+                    helperText: selectedType.label == 'Expense'
+                        ? 'Example: Petrol Expense, Food Expense'
+                        : selectedType.label == 'Income'
+                            ? 'Example: Salary Income, Freelance Income'
+                            : selectedType.isTransfer
+                                ? 'Example: Savings Account'
+                                : null,
+                  ),
+                  items: accounts
+                      .where((account) => account != selectedAccount)
+                      .map((account) {
+                    return DropdownMenuItem(
+                      value: account,
+                      child: Text(account),
+                    );
+                  }).toList(),
+                  onChanged: onToAccountChanged,
+                  validator: (value) {
+                    if ((selectedType.isTransfer ||
+                            selectedType.label == 'Expense' ||
+                            selectedType.label == 'Income') &&
+                        (value == null || value.isEmpty)) {
+                      if (selectedType.isTransfer) {
+                        return 'Please select destination account';
+                      } else if (selectedType.label == 'Expense') {
+                        return 'Please select expense account';
+                      } else {
+                        return 'Please select income source account';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ],
@@ -352,6 +437,172 @@ class TransactionTemplate extends StatelessWidget {
       ],
     );
   }
+
+  Widget _buildDoubleEntrySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Balance summary card
+        BarakahCard(
+          child: Padding(
+            padding: const EdgeInsets.all(BarakahSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Transaction Balance',
+                  style: BarakahTypography.subtitle1.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: BarakahSpacing.xs),
+                Text(
+                  'Total debits must equal total credits',
+                  style: BarakahTypography.caption,
+                ),
+                const SizedBox(height: BarakahSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Total Debits',
+                              style: BarakahTypography.caption),
+                          Text(
+                            'PKR ${totalDebits.toStringAsFixed(2)}',
+                            style: BarakahTypography.subtitle1.copyWith(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Total Credits',
+                              style: BarakahTypography.caption),
+                          Text(
+                            'PKR ${totalCredits.toStringAsFixed(2)}',
+                            style: BarakahTypography.subtitle1.copyWith(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: BarakahSpacing.md),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        isBalanced
+                            ? 'Transaction is balanced ✅'
+                            : 'Transaction is not balanced yet ❌',
+                        style: TextStyle(
+                          color: isBalanced ? Colors.green : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (totalDebits != totalCredits)
+                      Text(
+                        'Difference: PKR ${(totalDebits - totalCredits).abs().toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: BarakahSpacing.md),
+
+        // Explanation card
+        BarakahCard(
+          child: Padding(
+            padding: const EdgeInsets.all(BarakahSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Double-Entry Accounting Basics:',
+                  style: BarakahTypography.subtitle1.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: BarakahSpacing.sm),
+                const Text(
+                  '• Every transaction affects at least two accounts',
+                ),
+                const SizedBox(height: BarakahSpacing.xs),
+                const Text(
+                  '• Total debits must equal total credits',
+                ),
+                const SizedBox(height: BarakahSpacing.xs),
+                const Text(
+                  '• Debit: Increases assets & expenses, decreases liabilities & income',
+                ),
+                const SizedBox(height: BarakahSpacing.xs),
+                const Text(
+                  '• Credit: Increases liabilities & income, decreases assets & expenses',
+                ),
+                const SizedBox(height: BarakahSpacing.md),
+                const Text(
+                  'Toggle between debit and credit entries as needed',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: BarakahSpacing.md),
+
+        // Entries list
+        ...entries.asMap().entries.map((mapEntry) {
+          final index = mapEntry.key;
+          final entry = mapEntry.value;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: BarakahSpacing.md),
+            child: FlexibleEntryRow(
+              index: index,
+              selectedAccount: entry.accountId,
+              accounts: accounts,
+              isDebit: entry.isDebit,
+              amountController: entry.amountController,
+              onAccountChanged: (account) =>
+                  onEntryAccountChanged(index, account),
+              onEntryTypeChanged: (isDebit) =>
+                  onEntryTypeChanged(index, isDebit),
+              onRemove: () => onRemoveEntry(index),
+              canRemove: entries.length > 2, // Need at least 2 entries
+            ),
+          );
+        }).toList(),
+
+        // Add entry button
+        Center(
+          child: OutlinedButton.icon(
+            onPressed: onAddEntry,
+            icon: const Icon(Icons.add),
+            label: const Text('Add Entry'),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class TransactionTypeData {
@@ -360,6 +611,12 @@ class TransactionTypeData {
   final Color color;
   final bool showCategory;
   final bool isTransfer;
+  final bool isDoubleEntry; // New property to indicate double-entry transaction
+  final String? defaultFromAccount; // Default FROM account (source of funds)
+  final String? defaultToAccount; // Default TO account (destination of funds)
+  final String? fromAccountLabel; // Custom label for FROM account selection
+  final String? toAccountLabel; // Custom label for TO account selection
+  final List<String>? templateEntries; // Optional preset entries for this type
 
   const TransactionTypeData({
     required this.label,
@@ -367,6 +624,12 @@ class TransactionTypeData {
     required this.color,
     this.showCategory = true,
     this.isTransfer = false,
+    this.isDoubleEntry = false,
+    this.defaultFromAccount,
+    this.defaultToAccount,
+    this.fromAccountLabel,
+    this.toAccountLabel,
+    this.templateEntries,
   });
 
   @override

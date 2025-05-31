@@ -1,8 +1,8 @@
-# Transactions and Entries Implementation Plan
+# Transactions and Entries Implementation Plan (Updated)
 
 **Project**: Baraka Islamic Finance Application  
-**Date**: May 27, 2025  
-**Development Approach**: UI-First Clean Architecture  
+**Date**: May 31, 2025  
+**Development Approach**: UI-First Clean Architecture with Double-Entry Accounting
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -17,17 +17,25 @@
 
 ### Project Status
 - ✅ **Accounts Feature**: Fully implemented with clean architecture
-- ✅ **Design System**: Complete atomic design components
+- ✅ **Design System**: Complete atomic design components with double-entry UI elements
 - ✅ **Application Structure**: Navigation, routing, and core setup
-- 🔄 **Entries Feature**: Models exist, infrastructure needed
-- 🔄 **Transactions Feature**: Models exist, infrastructure needed
+- 🔄 **Entries Feature**: Models exist, infrastructure needed, UI updated for double-entry
+- 🔄 **Transactions Feature**: Models exist, infrastructure needed, UI updated for double-entry
 
-### Development Methodology: UI-First Approach
+### Development Methodology: UI-First Approach with Double-Entry Accounting
 Following the proven UI-First approach where:
 1. UI components serve as the foundation and reference point
 2. Backend infrastructure is built to support UI requirements
 3. Tangible progress is visible at each development step
 4. Dependencies are managed through clear UI-driven requirements
+5. Double-entry accounting principles are maintained throughout
+
+### Islamic Finance Principles Integration
+The application now explicitly supports:
+1. **Zakat Calculation**: Proper account categorization and tracking
+2. **Interest-Free Transactions**: Adherence to Islamic finance principles
+3. **Comprehensive Financial Tracking**: Detailed asset and liability management
+4. **Charitable Giving**: Integrated sadaqa and waqf tracking
 
 ## Architecture Analysis
 
@@ -36,6 +44,10 @@ Following the proven UI-First approach where:
 lib/
 ├── common/                    # Shared utilities and services
 ├── design_system/            # Atomic design components
+│   ├── atoms/                # Basic UI elements
+│   ├── molecules/            # Combined elements (including EntryRow)
+│   ├── organisms/            # Complex UI components
+│   └── templates/            # Business-logic agnostic screen templates
 ├── features/                 # Feature-based modules
 │   └── [feature_name]/
 │       ├── models/           # Data models (ObjectBox entities)
@@ -51,6 +63,7 @@ lib/
 3. **State Management**: Riverpod with code generation for type safety
 4. **Database Integration**: ObjectBox with proper entity relationships
 5. **UI-First Evidence**: Templates are business-logic agnostic with callback patterns
+6. **Double-Entry Accounting**: Robust foundation for financial integrity
 
 ### Dependency Relationships
 - **Accounts ← Entries/Transactions**: Accounts need transaction data for balance calculations
@@ -70,6 +83,12 @@ Based on dependency analysis and UI-First methodology:
 3. **Transaction Building Blocks**: Transactions are composed of multiple entries
 4. **Double-Entry Bookkeeping**: Each transaction requires at least two entries
 
+### New UI Components for Double-Entry
+1. **EntryRow**: A molecule component for individual debit/credit entries
+2. **EntryData**: A data model for entry information
+3. **Double-Entry Transaction Types**: Custom transaction types supporting proper accounting
+4. **Balance Verification**: Real-time validation of transaction integrity
+
 ## Phase 1: Entries Implementation
 
 ### 🎯 **Objective**: Create complete entries infrastructure to support account balance calculations and transaction composition
@@ -78,7 +97,7 @@ Based on dependency analysis and UI-First methodology:
 ```
 features/entries/
 ├── models/
-│   └── entry.dart ✅ (exists)
+│   └── entry.dart ✅ (exists, needs enhancement for double-entry)
 ├── repositories/
 │   └── entry_repository.dart 🔄 (to create)
 ├── providers/
@@ -87,7 +106,26 @@ features/entries/
 │   └── entry_controller.dart 🔄 (to create)
 └── screens/
     ├── entry_list_screen.dart 🔄 (to create)
-    └── add_entry_screen.dart 🔄 (to create)
+    └── add_entry_screen.dart 🔄 (not needed - integrated in transaction screen)
+```
+
+### Enhanced Entry Model Requirements
+```dart
+class Entry {
+  int id;
+  int accountId;  // Account being affected
+  int transactionId;  // Transaction this entry belongs to
+  bool isDebit;  // Debit (true) or Credit (false)
+  double amount;  // Amount of the entry
+  DateTime date;  // Date of the transaction
+  String? notes;  // Optional notes
+  int? categoryId;  // Optional category reference
+  
+  // Double-entry specific fields
+  String entryType;  // Classification: 'ASSET', 'LIABILITY', 'INCOME', 'EXPENSE', 'EQUITY'
+  bool isIslamic;  // Whether this follows Islamic finance principles
+  String? islamicCategory;  // e.g., 'ZAKAT', 'SADAQA', 'WAQF', etc.
+}
 ```
 
 ### 1.1 Entry Repository Implementation
@@ -114,6 +152,11 @@ class EntryRepository {
   Future<double> getAccountDebitTotal(int accountId)
   Future<double> getAccountCreditTotal(int accountId)
   Future<double> getAccountBalance(int accountId)
+  
+  // Islamic Finance Specific Queries
+  List<Entry> getZakatEligibleEntries(DateTime asOfDate)
+  List<Entry> getSadaqaEntries(DateTime start, DateTime end)
+  double getTotalZakatPaid(DateTime start, DateTime end)
   
   // Category Queries
   List<Entry> getEntriesByCategory(int categoryId)
@@ -143,6 +186,11 @@ class EntryRepository {
 - Retrieve all entries for a specific transaction
 - Validate transaction balance (debits = credits)
 - Support transaction deletion with cascade
+
+**Islamic Finance Specific Queries**
+- Identify entries eligible for zakat
+- Track sadaqa contributions
+- Calculate total zakat paid over a period
 
 **Business Logic Support**
 - Category-based filtering
@@ -252,27 +300,38 @@ Future<EntryFormController> entryFormController(ref)
 
 ## Phase 2: Transactions Implementation
 
-### 🎯 **Objective**: Create complete transaction infrastructure that coordinates multiple entries and provides user-facing transaction management
+### 🎯 **Objective**: Create complete transaction infrastructure that coordinates multiple entries and provides user-facing transaction management with double-entry support
 
-### Folder Structure Creation
-```
-features/transactions/
-├── models/
-│   └── transaction.dart ✅ (exists)
-├── repositories/
-│   └── transaction_repository.dart 🔄 (to create)
-├── providers/
-│   └── transaction_provider.dart 🔄 (to create)
-├── controllers/
-│   └── transaction_controller.dart 🔄 (to create)
-└── screens/
-    ├── transaction_list_screen.dart ✅ (exists, needs connection)
-    └── transaction_screen.dart ✅ (exists, needs connection)
+### Enhanced Transaction Types
+The transaction UI now explicitly supports:
+1. **Standard Transactions**: Simple income/expense/transfer
+2. **Custom Double-Entry**: Full flexibility for any transaction type
+3. **Islamic Finance Specific**: Zakat, Sadaqa, Waqf transactions
+4. **Asset Management**: Purchasing, selling, and tracking assets
+5. **Liability Management**: Loans, debts, and Islamic financing options
+
+### Enhanced Transaction Model Requirements
+```dart
+class Transaction {
+  int id;
+  String description;
+  DateTime date;
+  double amount;  // Total transaction amount (for display purposes)
+  bool isRecurring;
+  String? frequency;
+  int? categoryId;
+  
+  // Double-entry specific fields
+  String transactionType;  // 'EXPENSE', 'INCOME', 'TRANSFER', 'CUSTOM', 'ZAKAT', 'ASSET', 'LIABILITY'
+  bool isIslamic;  // Whether this follows Islamic finance principles
+  bool isBalanced;  // Whether debits = credits (validation)
+  String? islamicCategory;  // e.g., 'ZAKAT', 'SADAQA', 'WAQF', etc.
+}
 ```
 
 ### 2.1 Transaction Repository Implementation
 
-#### Required Database Operations
+#### Required Database Operations with Double-Entry Support
 ```dart
 class TransactionRepository {
   // CRUD Operations
@@ -289,9 +348,15 @@ class TransactionRepository {
   
   // Query Operations
   List<Transaction> getTransactionsByDateRange(DateTime start, DateTime end)
-  List<Transaction> getTransactionsByContact(int contactId)
+  List<Transaction> getTransactionsByType(String type)
+  List<Transaction> getIslamicTransactions(bool isIslamic)
   List<Transaction> getTransactionsByAccount(int accountId)
   List<Transaction> searchTransactions(String query)
+  
+  // Islamic Finance Specific
+  List<Transaction> getZakatTransactions(DateTime start, DateTime end)
+  List<Transaction> getSadaqaTransactions(DateTime start, DateTime end)
+  double getZakatableAssetTotal(DateTime asOfDate)
   
   // Validation
   Future<bool> validateTransactionBalance(int transactionId)
@@ -300,6 +365,7 @@ class TransactionRepository {
   // Reporting
   Future<double> getTransactionTotal(int transactionId)
   Future<Map<String, double>> getTransactionSummaryByPeriod(DateTime start, DateTime end)
+  Future<Map<String, double>> getZakatSummary(DateTime asOfDate)
 }
 ```
 
@@ -315,6 +381,11 @@ class TransactionRepository {
 - Contact-based transaction history
 - Account-specific transaction lists
 - Full-text search capabilities
+
+**Islamic Finance Specific Queries**
+- Retrieve zakat and sadaqa transactions
+- Calculate total zakatable assets
+- Validate Islamic finance compliance
 
 **Business Logic Support**
 - Transaction balance validation (debits = credits)
@@ -413,34 +484,39 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
 
 ## Phase 3: Integration & Enhancement
 
-### 3.1 Account Integration
-- Update account balance calculations to use entry data
-- Implement real-time balance updates
-- Add transaction history to account details
+### 3.1 Account Integration with Islamic Finance Support
+- Update account types to include Islamic-specific categories
+- Implement account classification for zakat calculations
+- Enhance balance calculations for different account types
+- Add specific validation for Islamic finance compliance
 
-### 3.2 Category Integration
-- Connect entries to category system
-- Implement category-based reporting
-- Add category filtering throughout the application
+### 3.2 Islamic Finance Specific Features
+- Implement zakat calculation based on assets and liabilities
+- Add sadaqa tracking and reporting
+- Implement interest purification mechanisms
+- Add Islamic financial calendar support (Hijri dates)
 
 ### 3.3 Validation & Business Rules
-- Implement comprehensive validation rules
-- Add Islamic finance compliance checks
-- Enhance error handling and user feedback
+- Enhanced validation for double-entry transactions
+- Islamic finance compliance checks
+- Asset and liability verification
+- Zakat eligibility validation
 
 ### 3.4 Reporting & Analytics
-- Implement date-range based reports
-- Add account balance history
-- Create transaction summary views
+- Implement comprehensive financial statements
+- Add zakat calculation reports
+- Create charity donation tracking
+- Add asset growth and depreciation analysis
 
 ## Progress Tracking
 
-### Phase 1: Entries Implementation
+### Updated Phase 1: Entries Implementation
 - [ ] **1.1 Entry Repository**
   - [ ] Create `entry_repository.dart`
   - [ ] Implement CRUD operations
   - [ ] Add account-specific queries
   - [ ] Add balance calculation methods
+  - [ ] Add Islamic finance specific methods
   - [ ] Add validation functions
   - [ ] Write unit tests
 
@@ -448,6 +524,7 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
   - [ ] Create `entry_provider.dart`
   - [ ] Implement core entry management
   - [ ] Add filtered entry providers
+  - [ ] Add Islamic finance providers
   - [ ] Add balance calculation providers
   - [ ] Add validation providers
   - [ ] Generate provider code
@@ -461,17 +538,17 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
 
 - [ ] **1.4 Entry Screens**
   - [ ] Create `entry_list_screen.dart`
-  - [ ] Create `add_entry_screen.dart`
   - [ ] Connect to controllers and providers
   - [ ] Implement UI validation
   - [ ] Add navigation integration
 
-### Phase 2: Transactions Implementation
+### Updated Phase 2: Transactions Implementation
 - [ ] **2.1 Transaction Repository**
   - [ ] Create `transaction_repository.dart`
   - [ ] Implement CRUD operations
   - [ ] Add entry coordination methods
   - [ ] Add complex query operations
+  - [ ] Add Islamic finance methods
   - [ ] Add validation functions
   - [ ] Write unit tests
 
@@ -480,6 +557,7 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
   - [ ] Implement core transaction management
   - [ ] Add filtered transaction providers
   - [ ] Add complex operation providers
+  - [ ] Add Islamic finance providers
   - [ ] Add reporting providers
   - [ ] Generate provider code
 
@@ -490,33 +568,37 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
   - [ ] Add detail management
   - [ ] Generate controller code
 
-- [ ] **2.4 Transaction Screens**
-  - [ ] Connect `transaction_list_screen.dart`
-  - [ ] Connect `transaction_screen.dart`
-  - [ ] Enhance with multi-entry forms
-  - [ ] Add validation and error handling
+- [x] **2.4 Transaction Screens**
+  - [x] Update `transaction_screen.dart` for double-entry
+  - [x] Connect UI templates
+  - [x] Enhance with multi-entry forms
+  - [x] Add validation and error handling
   - [ ] Implement advanced filtering
 
-### Phase 3: Integration & Enhancement
+### Updated Phase 3: Integration & Enhancement
 - [ ] **3.1 Account Integration**
-  - [ ] Update account balance calculations
-  - [ ] Add real-time balance updates
+  - [ ] Update account types and classifications
+  - [ ] Add Islamic account categories
+  - [ ] Implement real-time balance updates
   - [ ] Enhance account detail screens
 
-- [ ] **3.2 Category Integration**
-  - [ ] Connect entries to categories
-  - [ ] Add category-based reporting
-  - [ ] Implement category filtering
+- [ ] **3.2 Islamic Finance Implementation**
+  - [ ] Implement zakat calculation
+  - [ ] Add sadaqa tracking
+  - [ ] Add interest purification
+  - [ ] Implement Islamic calendar support
 
 - [ ] **3.3 Validation & Business Rules**
   - [ ] Comprehensive validation rules
   - [ ] Islamic finance compliance
+  - [ ] Asset and liability verification
   - [ ] Enhanced error handling
 
 - [ ] **3.4 Reporting & Analytics**
-  - [ ] Date-range reports
-  - [ ] Balance history
-  - [ ] Transaction summaries
+  - [ ] Financial statements
+  - [ ] Zakat reports
+  - [ ] Charity tracking
+  - [ ] Asset analysis
 
 ## Implementation Notes
 
@@ -525,7 +607,8 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
 2. **Clean Architecture**: Maintain clear separation between layers
 3. **Test-Driven Development**: Write tests for business logic components
 4. **Islamic Finance Compliance**: Ensure all features align with Islamic principles
-5. **Progressive Enhancement**: Build core functionality first, add advanced features later
+5. **Double-Entry Integrity**: Maintain accounting principles throughout
+6. **Progressive Enhancement**: Build core functionality first, add advanced features later
 
 ### Technical Considerations
 - **ObjectBox Integration**: Leverage ObjectBox relationships and query capabilities
@@ -533,6 +616,7 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
 - **Error Handling**: Implement comprehensive error handling at all layers
 - **Performance**: Optimize database queries and provider dependencies
 - **Validation**: Both client-side and business logic validation
+- **Islamic Compliance**: Ensure all financial operations comply with Islamic principles
 
 ### Success Metrics
 - ✅ All accounts show real balances from entry data
@@ -540,6 +624,7 @@ Future<TransactionDetailController> transactionDetailController(ref, int transac
 - ✅ Double-entry bookkeeping validation works correctly
 - ✅ UI remains responsive and user-friendly
 - ✅ Islamic finance principles are maintained throughout
+- ✅ Zakat calculations are accurate and reliable
 
 ---
 

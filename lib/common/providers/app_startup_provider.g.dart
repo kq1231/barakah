@@ -26,7 +26,7 @@ final objectBoxStoreProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ObjectBoxStoreRef = AutoDisposeFutureProviderRef<ObjectBoxService>;
-String _$appStartupHash() => r'695618db06f6460693f14073d7df15ba98457c19';
+String _$appStartupHash() => r'f955552dc99130553c41cc012d502ed4fa59cbd5';
 
 /// Provider that manages the entire app initialization flow
 ///

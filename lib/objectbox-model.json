@@ -85,7 +85,7 @@
     },
     {
       "id": "5:1388437509732955701",
-      "lastPropertyId": "6:5676576648899471708",
+      "lastPropertyId": "8:1089187572826736962",
       "name": "Entry",
       "properties": [
         {
@@ -123,14 +123,27 @@
         {
           "id": "6:5676576648899471708",
           "name": "categoryId",
-          "type": 6
+          "type": 11,
+          "flags": 520,
+          "indexId": "9:7386255850450862099",
+          "relationTarget": "Category"
+        },
+        {
+          "id": "7:8852195089723514863",
+          "name": "description",
+          "type": 9
+        },
+        {
+          "id": "8:1089187572826736962",
+          "name": "reconciliationNote",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "7:740633888816722784",
-      "lastPropertyId": "5:2505440122330321124",
+      "lastPropertyId": "12:783411058289563491",
       "name": "Transaction",
       "properties": [
         {
@@ -142,7 +155,7 @@
         {
           "id": "2:8696267373316840778",
           "name": "date",
-          "type": 9
+          "type": 10
         },
         {
           "id": "3:4893888422543552195",
@@ -161,6 +174,41 @@
           "flags": 520,
           "indexId": "6:5779602685810808741",
           "relationTarget": "Contact"
+        },
+        {
+          "id": "6:4346527588281728800",
+          "name": "type",
+          "type": 9
+        },
+        {
+          "id": "7:8537123217815849563",
+          "name": "amount",
+          "type": 8
+        },
+        {
+          "id": "8:4149685792665489573",
+          "name": "notes",
+          "type": 9
+        },
+        {
+          "id": "9:7628294109564973738",
+          "name": "tags",
+          "type": 9
+        },
+        {
+          "id": "10:2920020621640974583",
+          "name": "isVerified",
+          "type": 1
+        },
+        {
+          "id": "11:6203842597228069692",
+          "name": "isCompliant",
+          "type": 1
+        },
+        {
+          "id": "12:783411058289563491",
+          "name": "complianceNotes",
+          "type": 9
         }
       ],
       "relations": []
@@ -271,7 +319,7 @@
     }
   ],
   "lastEntityId": "9:6075724319454888878",
-  "lastIndexId": "8:8757253880787924036",
+  "lastIndexId": "9:7386255850450862099",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
